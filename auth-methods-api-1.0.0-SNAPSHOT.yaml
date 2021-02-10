@@ -1,0 +1,1044 @@
+openapi: 3.0.2
+info:
+  title: Auth method API - TietoEVRY FS Security
+  version: 1.0.0-SNAPSHOT
+  description: <strong>Note:</strong> Services that take an encrypted payload are
+    represented plainly using a wrapper object with a "jwe" property. In
+    practice these must be encrypted using RFC 7516 - JSON Web Encryption (JWE).
+paths:
+  /v1/auth/methods/password/:
+    post:
+      tags:
+        - Password
+      summary: Start a password authentication process.
+      operationId: startPasswordAuthentication
+      parameters:
+        - name: X-EVRY-CLIENT-CLIENTNAME
+          in: header
+          required: true
+          description: The name of the client that is the originator of the request.
+          example: bank-s2s-client
+          schema:
+            type: string
+        - name: X-EVRY-DATAOWNERORGID
+          in: header
+          required: true
+          description: The organization ID of the bank.
+          example: 47000322
+          schema:
+            type: string
+        - name: X-EVRY-CLIENT-ISMOBILE
+          in: header
+          required: true
+          description: Whether this request originates from a mobile device.
+          example: true
+          schema:
+            type: boolean
+        - name: X-EVRY-CLIENT-REQUESTID
+          in: header
+          required: true
+          description: A generated unique ID representing this request.
+          example: 7a333fdb-5414-4e9d-a0dd-9eafe24b564d
+          schema:
+            type: string
+        - name: X-EVRY-SELFSERVICE
+          in: header
+          required: true
+          description: Whether this request originates from a self service channel.
+          example: false
+          schema:
+            type: boolean
+        - name: X-EVRY-TRANSACTIONID
+          in: header
+          required: true
+          description: A generated unique ID representing the entire transaction this
+            request relates to (i.e. an ID across requests).
+          example: e65f6bd9-3048-4c68-a112-e2160aab84f5
+          schema:
+            type: string
+        - name: X-EVRY-USERID
+          in: header
+          required: true
+          description: ID of the user that triggered this request.
+          example: 30117312345
+          schema:
+            type: string
+        - name: X-EVRY-CUSTOMERID
+          in: header
+          required: false
+          description: ID of the user this request concerns.
+          example: 611944812345
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: Password was successfully changed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartPasswordResponse"
+  "/v1/auth/methods/password/{auth-process-id}":
+    put:
+      tags:
+        - Password
+      summary: Finish a password authentication process.
+      operationId: finishPasswordAuthentication
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/6"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/7"
+        - $ref: "#/components/parameters/AuthProcessIdPathParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinishPasswordJweRequest"
+        required: true
+      responses:
+        "200":
+          description: Password was validated (not necessarily successfully - see status).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinishAuthenticationResponse"
+  /v1/auth/methods/otp-device-password:
+    post:
+      summary: Start the authentication.
+      operationId: startOtpDevicePassword
+      tags:
+        - OTP-DEVICE_PASSWORD
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MethodsPostRequest"
+      responses:
+        "200":
+          description: Authentication successfully started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodsPostResponse"
+  /v1/auth/methods/sms-otp-password:
+    post:
+      summary: Start the authentication.
+      operationId: startSmsOtpPassword
+      tags:
+        - SMS-OTP_PASSWORD
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SmsOtpPostRequest"
+      responses:
+        "200":
+          description: Authentication successfully started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SmsOtpPostResponse"
+  /v1/auth/methods/sa-mobile-strong:
+    post:
+      tags:
+        - SA-MOBILE-STRONG
+      summary: Start the authentication for mobile.
+      operationId: startMobileStrong
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaMobileStrongPostRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaMobileStrongPostResponse"
+  "/v1/auth/methods/sa-mobile-strong/{id}":
+    get:
+      tags:
+        - SA-MOBILE-STRONG
+      summary: Obtains the result of the authentication process.
+      operationId: getSaMobileResult
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+      responses:
+        "200":
+          description: Data successfully sent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaMobileStrongGetResponse"
+  /v1/auth/methods/sa-mobile-strong/instruments:
+    get:
+      tags:
+        - SA-MOBILE-STRONG
+      summary: List out all active authentication instruments.
+      operationId: getMobileStrongInstruments
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      responses:
+        "200":
+          description: Active authentication instruments successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetInstrumentResponse"
+  /v1/auth/methods/card-callout-strong:
+    post:
+      tags:
+        - CARD-CALLOUT-STRONG
+      summary: Starts the authentication process.
+      operationId: startCardCalloutStrong
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CardCalloutStrongPostRequest"
+      responses:
+        "200":
+          description: Authentication successfully started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardCalloutStrongPostResponse"
+  "/v1/auth/methods/card-callout-strong/{id}":
+    get:
+      tags:
+        - CARD-CALLOUT-STRONG
+      summary: Obtains the result of the authentication process.
+      operationId: getCardCalloutStrongResult
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+      responses:
+        "200":
+          description: Authentication status returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaMobileStrongGetResponse"
+  /v1/auth/methods/code-card-password:
+    post:
+      tags:
+        - CODE-CARD_PASSWORD
+      summary: Start authentication with CODE-CARD_PASSWORD.
+      operationId: startCodeCardPassword
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MethodsPostRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeCardPasswordPostResponse"
+  "/v1/auth/methods/code-card-password/{id}":
+    put:
+      tags:
+        - CODE-CARD_PASSWORD
+      summary: Completes the authentication process for code-card_password.
+      operationId: completeCodeCardPassword
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+        - $ref: "#/components/parameters/BrandIdQueryParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MethodsPutRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully completed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodsPutResponse"
+  "/v1/auth/methods/otp-device-password/{id}":
+    put:
+      tags:
+        - OTP-DEVICE_PASSWORD
+      summary: Completes the authentication process for OTP-DEVICE_PASSWORD.
+      operationId: completeOtpDevicePassword
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+        - $ref: "#/components/parameters/BrandIdQueryParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MethodsPutRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully completed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodsPutResponse"
+  "/v1/auth/methods/sms-otp-password/{id}":
+    put:
+      tags:
+        - SMS-OTP_PASSWORD
+      summary: Completes the authentication process for OTP-DEVICE_PASSWORD.
+      operationId: completeSmsOtpPassword
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+        - $ref: "#/components/parameters/BrandIdQueryParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MethodsPutRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully completed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodsPutResponse"
+    patch:
+      tags:
+        - SMS-OTP_PASSWORD
+      description: Updates an ongoing authentication process by sending out a new SMS OTP.
+      operationId: updateSmsOtpPassword
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+        - $ref: "#/components/parameters/BrandIdQueryParam"
+      responses:
+        "200":
+          description: SMS OTP resent successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SmsOtpPostResponse"
+  /v1/auth/methods/pin-otp-device:
+    post:
+      tags:
+        - PIN-OTP-DEVICE
+      summary: Start authentication with PIN-OTP-DEVICE.
+      operationId: startPinOtpDevice
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MethodsPostRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodsPostResponse"
+  "/v1/auth/methods/pin-otp-device/{id}":
+    put:
+      tags:
+        - PIN-OTP-DEVICE
+      summary: Completes the authentication process for pin-otp-device.
+      operationId: completePinOtpDevice
+      parameters:
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/0"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/1"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/3"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/5"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/4"
+        - $ref: "#/paths/~1v1~1auth~1methods~1password~1/post/parameters/2"
+        - $ref: "#/components/parameters/IdPathParam"
+        - $ref: "#/components/parameters/BrandIdQueryParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jwe
+              properties:
+                jwe:
+                  allOf:
+                    - $ref: "#/components/schemas/FinishPasswordJweRequest/properties/jwe/allOf/0"
+                    - $ref: "#/components/schemas/PinOtpDevicePutRequest"
+        required: true
+      responses:
+        "200":
+          description: Authentication successfully completed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MethodsPutResponse"
+components:
+  schemas:
+    StartPasswordRequest:
+      type: object
+      properties:
+        logonId:
+          type: string
+          description: ID of the user to start authentication with.
+          example: 61194123456
+    StartPasswordResponse:
+      type: object
+      required:
+        - id
+        - type
+        - logonId
+        - authFactors
+        - links
+      properties:
+        id:
+          type: string
+          description: The ID of the started authentication process.
+          example: 60745a74-b735-48fd-a037-1d242b7e5085c9fd560a-b8dd-410e-b13b-e078b85238e3
+        type:
+          enum:
+            - CREDENTIAL
+          description: The type of authentication method password is.
+          example: CREDENTIAL
+        logonId:
+          type: string
+          description: ID of the user being authenticated.
+          example: 6119412345
+        isLastAttempt:
+          type: boolean
+          description: Indicates whether this is the last failed authentication attempt
+            before the user is blocked, if this information is available.
+        authFactors:
+          type: array
+          items:
+            type: string
+            enum:
+              - password
+              - newPassword
+          description: Describes the required input (authentication factors) to complete
+            this authentication process.
+          example:
+            - password
+    FinishPasswordJweRequest:
+      type: object
+      required:
+        - jwe
+      properties:
+        jwe:
+          allOf:
+            - type: object
+              required:
+                - iat
+                - jti
+              properties:
+                iat:
+                  type: string
+                  description: https://tools.ietf.org/html/rfc7519#section-4.1.6
+                  example: 1587724071
+                jti:
+                  type: string
+                  description: https://tools.ietf.org/html/rfc7519#section-4.1.7
+                  example: 17e3338d-344b-403c-8a87-f7d8006d6e33
+            - type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                  description: The password to authenticate with.
+                  example: BlueGrape2009
+                newPassword:
+                  type: string
+                  description: An optional new password. If it's set and authentication is
+                    successful it will be the new password.
+                  example: RedPear2020
+    FinishAuthenticationResponse:
+      type: object
+      required:
+        - jwe
+      properties:
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - EXPIRED
+            - FAILED
+            - BLOCKED
+            - PASSWORD_UPDATE_FAILED
+          description: The result of the authentication attempt.
+          example: SUCCESS
+        details:
+          type: string
+          description: Name of the authentication instrument that failed validation, if any.
+          example: pin-otp-device
+        token:
+          type: string
+          description: A JWS/JWE containing some information about the authentication.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI
+        externalToken:
+          type: string
+          description: A JWS/JWE containing some information about the authentication from
+            an external source.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dnZWRJbkFzIjoiYWRtaW4iLCJpYXQiOjE0MjI3Nzk2Mzh9.gzSraSYS8EXBxLN_oWnFSRgCzcmJmMjLiuyu5CSpyHI
+    OobPostRequest:
+      type: object
+      properties:
+        structuredConfirmText:
+          type: array
+          items:
+            type: string
+          description: Structured context that can be displayed during authentication of
+            user.
+        confirmText:
+          type: string
+          description: Text that should be displayed during authentication of the user.
+          example: "Your code is {0} with reference: {1}."
+        callbackUrl:
+          type: string
+          description: The callback URL.
+          example: callbackUrl?statechange=12345675
+        cardContext:
+          $ref: "#/components/schemas/CardContext"
+    SaMobileStrongPostRequest:
+      allOf:
+        - $ref: "#/components/schemas/OobPostRequest"
+        - type: object
+          properties:
+            logonId:
+              type: string
+              description: The ID entered by the user during authentication.
+              example: 123-12345675
+            instrumentId:
+              type: string
+              description: The ID of the SA Mobile instrument that should be used for
+                authentication.
+              example: EN12345678991_56_4A82808FB045700.
+            showChallenge:
+              type: boolean
+              description: Indicate if challenge is to be shown to the user prior to
+                authentication.
+              example: false
+            cardContext:
+              $ref: "#/components/schemas/CardContext"
+    CardCalloutStrongPostRequest:
+      allOf:
+        - $ref: "#/components/schemas/OobPostRequest"
+        - type: object
+          properties:
+            mobileNumber:
+              type: string
+              description: Mobile number formatted +<countrycode><national format>.
+              example: 4741607735
+            email:
+              type: string
+              description: E-mail address.
+            cardContext:
+              $ref: "#/components/schemas/CardContext"
+    SaMobileStrongPostResponse:
+      allOf:
+        - $ref: "#/components/schemas/OobPostResponse"
+        - type: object
+          properties:
+            instrumentId:
+              type: string
+              description: The ID of the SA Mobile device that should be used for
+                authentication.
+              example: EN12345678991_56_4A82808FB045700
+            challange:
+              type: string
+              description: Contains the correct challenge that should be presented to the
+                user.
+              example: DD
+            showChallenge:
+              type: boolean
+              description: Indicate if challenge is to be shown to the user prior to
+                authentication.
+              example: true
+    CardCalloutStrongPostResponse:
+      allOf:
+        - $ref: "#/components/schemas/OobPostResponse"
+        - type: object
+          properties:
+            mobileNumber:
+              type: string
+              description: Mobile number on format +<countrycode><national format>.
+              example: 4741607735
+            email:
+              type: string
+              description: E-mail address.
+    OobPostResponse:
+      type: object
+      required:
+        - id
+        - type
+        - logonId
+        - confirmText
+      properties:
+        id:
+          type: string
+          description: The ID of the resource.
+          example: 5ea44816-b8f8-43fb-adcb-9aff38cb4cba7735217d-9d14-42d8-97fc-3a4b6dd8114d
+        type:
+          type: string
+          enum:
+            - UNKNOWN
+            - OOB
+            - CREDENTIAL
+            - CHALLENGE_CREDENTIAL
+            - OIDC
+          description: The type of authentication method.
+          example: OOB
+        logonId:
+          type: string
+          description: The ID entered by the user during authentication.
+          example: 12345678991
+        isLastAttempt:
+          type: boolean
+          description: Whether this is the last attempt before the user is blocked if they
+            fail authentication.
+          example: true
+        confirmText:
+          type: string
+          description: Text that should be displayed to the user during authentication.
+          example: "Your code is {0} with reference: {1}."
+        structuredConfirmText:
+          type: array
+          items:
+            type: string
+          description: Structured context that can be displayed during authentication of
+            user.
+        callbackUrl:
+          type: string
+          description: The callback url.
+          example: callbackUrl?statechange=12345675
+        pushEnabled:
+          type: boolean
+          description: Indicates if the auth device can be reached through push.
+          example: true
+        cardContext:
+          $ref: "#/components/schemas/CardContext"
+        links:
+          $ref: "#/components/schemas/Links"
+    SaMobileStrongGetResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          enum:
+            - SUCCESS
+            - PROCESSING
+            - STARTED
+            - EXPIRED
+            - CANCELLED
+            - FAILED
+          description: The status of authentication.
+          example: STARTED
+        token:
+          type: string
+          description: JWS/JWE authentication token containing some details about the
+            authentication.
+          example: eyJraWQiOiJzY3MtMDEiLCJjdHkiOiJhcHBsaWNhdGlvblwvanNvbiIsImVuYyI6IkExMjhHQ00iLCJhbGciOiJSU0EtT0FFUC0yNTYifQ
+    GetInstrumentResponse:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            $ref: "#/components/schemas/Instrument"
+          example:
+            - instrumentId: EN12345678991_56_4A82808FB04A6700
+              instrumentName: pie
+            - instrumentId: EN12345678991_56_85B1D0EFB6E0B4D1
+              instrumentName: BEA UK MyCard 2019-12-15
+    CodeCardPasswordPostResponse:
+      allOf:
+        - $ref: "#/components/schemas/MethodsPostResponse"
+        - type: object
+          required:
+            - challenge
+          properties:
+            challenge:
+              $ref: "#/components/schemas/Challenge"
+    MethodsPutRequest:
+      type: object
+      required:
+        - jwe
+      properties:
+        jwe:
+          allOf:
+            - $ref: "#/components/schemas/FinishPasswordJweRequest/properties/jwe/allOf/0"
+            - type: object
+              required:
+                - password
+                - otp
+              properties:
+                password:
+                  type: string
+                  description: Password to authenticate with.
+                  example: paEsc34
+                otp:
+                  type: string
+                  description: One-time password to authenticate with.
+                  example: 12owf8Wrf1
+                newPassword:
+                  type: string
+                  description: New password for the user.
+                  example: newPass16Wrf1
+    MethodsPutResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          enum:
+            - SUCCESS
+            - PROCESSING
+            - STARTED
+            - EXPIRED
+            - CANCELLED
+            - FAILED
+          description: The status of authentication.
+          example: STARTED
+        token:
+          type: string
+          description: JWS/JWE authentication token containing some details about the
+            authentication.
+          example: eyJraWQiOiJzY3MtMDEiLCJjdHkiOiJhcHBsaWNhdGlvblwvanNvbiIsImVuYyI6IkExMjhHQ00iLCJhbGciOiJSU0EtT0FFUC0yNTYifQ
+        externalToken:
+          type: string
+          description: JWS/JWE authentication token from external parties, e.g OIDC/FTN
+            towards Nets.
+          example: eyJraWQiOiJzY3MtMDEiLCJjdHkiOiJhcHBsaWNhdGlvblwvanNvbiIsImVuYyI6IU0EtT0FFUC0yNTYiOiJSU0EtT0FFUC0yNTY
+        details:
+          type: string
+          description: Instrument name if status is not SUCCESS.
+          example: Instrument does not exist
+    SmsOtpPostRequest:
+      allOf:
+        - $ref: "#/components/schemas/MethodsPostRequest"
+        - type: object
+          required:
+            - mobileNumber
+          properties:
+            mobileNumber:
+              type: string
+              description: Mobile number that should receive the OTP, formatted
+                +<countrycode><national format>.
+              example: 4741607735
+            confirmText:
+              type: string
+              description: The text that should be sent in SMS to the user. To indicate OTP
+                use {0} in text. To indicate ID of OTP use {1}.
+              example: "Your code is {0} with reference: {1}."
+    MethodsPostRequest:
+      type: object
+      properties:
+        logonId:
+          type: string
+          description: The ID entered by the user during authentication. Required when
+            indicated by list service.
+          example: 123-12345675
+    SmsOtpPostResponse:
+      allOf:
+        - $ref: "#/components/schemas/MethodsPostResponse"
+        - type: object
+          required:
+            - mobileNumber
+          properties:
+            mobileNumber:
+              type: string
+              description: The mobile number that should receive the OTP.
+            confirmText:
+              type: string
+              description: The text that should be sent in SMS to the user. To indicate OTP
+                use {0} in text.
+            otpId:
+              type: string
+              description: The ID of the OTP sent to the user.
+    MethodsPostResponse:
+      type: object
+      required:
+        - id
+        - type
+        - logonId
+        - authFactors
+      properties:
+        id:
+          type: string
+          description: The ID of the resource.
+          example: 5ea44816-b8f8-43fb-adcb-9aff38cb4cba7735217d-9d14-42d8-97fc-3a4b6dd8114d
+        type:
+          enum:
+            - UNKNOWN
+            - OOB
+            - CREDENTIAL
+            - CHALLENGE_CREDENTIAL
+            - OIDC
+          description: The type of authentication method.
+          example: CREDENTIAL
+        logonId:
+          type: string
+          description: The ID entered by the user during authentication.
+          example: 123-12345675
+        authFactors:
+          type: array
+          items:
+            type: string
+          description: Specifies authentification factors.
+          example:
+            - otp
+        links:
+          $ref: "#/components/schemas/Links"
+    PinOtpDevicePutRequest:
+      type: object
+      required:
+        - otp
+      properties:
+        otp:
+          type: string
+          description: One-time password to authenticate with.
+          example: 12owf8Wrf1
+    CardContext:
+      type: object
+      required:
+        - cardId
+        - cardIdVersion
+        - cardNumberMasked
+        - transaction
+      properties:
+        cardId:
+          type: string
+          description: The card ID.
+          example: "1140415"
+        cardIdVersion:
+          type: string
+          description: The card ID version.
+          example: "1"
+        cardNumberMasked:
+          type: string
+          description: Masked card number (PAN).
+          example: xxxxxxxxxxxx1234
+        deviceInfo:
+          type: string
+          description: Device information gathered by the 3DS SDK from a Consumer Device.
+            This is JSON name/value pairs that as a whole is Base64url encoded.
+          example: YW5kcm9pZA==
+        threeDSRequestorAppURL:
+          type: string
+          description: Merchant app declaring their URL within the CReq message so that
+            the Authentication app can call the Merchant app after OOB
+            authentication has occurred. Each transaction  would require a
+            unique Transaction ID by using the SDK Transaction ID.
+          example: https://example.com?transID=b2385523-a66c-4907-ac3c-91848e8c0067
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+    Transaction:
+      type: object
+      required:
+        - id
+        - merchant
+        - timestamp
+        - amount
+        - exponent
+        - currencyCode
+      properties:
+        id:
+          type: string
+          description: Unique ID of the transaction.
+          example: "114041515421"
+        merchant:
+          type: string
+          description: The name of merchant.
+          example: CoffeeHouse demo
+        timestamp:
+          type: string
+          description: The merchant timestamp.
+          example: 20190527 04:10:25
+        amount:
+          type: string
+          description: Amount of the transaction.
+          example: "5"
+        exponent:
+          type: string
+          description: Amount of decimals.
+          example: "2"
+        currencyCode:
+          type: string
+          description: Currency of the transaction.
+          example: USD
+        messageCategory:
+          type: string
+          description: Identifies the category of 3DS message.
+        deviceChannel:
+          type: string
+          description: Identifies the channel used to initiate the transaction.
+    Instrument:
+      type: object
+      required:
+        - instrumentId
+        - instrumentName
+      properties:
+        instrumentId:
+          description: The ID of the instrument.
+        instrumentName:
+          description: The name/description of the instrument.
+    Challenge:
+      type: object
+      required:
+        - serial
+        - version
+        - index
+      properties:
+        serial:
+          type: string
+          description: Challenge serial number.
+          example: "90570000058"
+        version:
+          type: string
+          description: Challenge version.
+          example: "1"
+        index:
+          type: string
+          description: Challenge index.
+          example: "32"
+    Links:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The link type.
+        value:
+          type: object
+          description: The link.
+          properties:
+            href:
+              type: string
+            verbs:
+              type: array
+              items:
+                type: string
+                enum:
+                  - POST
+                  - GET
+                  - PUT
+                  - DELETE
+  parameters:
+    AuthProcessIdPathParam:
+      name: auth-process-id
+      in: path
+      required: true
+      description: The ID of the authentication process.
+      example: 60745a74-b735-48fd-a037-1d242b7e5085c9fd560a-b8dd-410e-b13b-e078b85238e3
+      schema:
+        type: string
+    IdPathParam:
+      name: id
+      in: path
+      required: true
+      description: The ID of the resource.
+      example: 5ea44816-b8f8-43fb-adcb-9aff38cb4cba7735217d-9d14-42d8-97fc-3a4b6dd8114d
+      schema:
+        type: string
+    BrandIdQueryParam:
+      name: brandid
+      required: false
+      in: query
+      schema:
+        type: string
+      description: Specifies brandId.
+      example: BrandIdExample
